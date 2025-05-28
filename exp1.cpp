@@ -1,3 +1,4 @@
+// exp1.cpp 色を抽出する
 #include <opencv2/opencv.hpp>
 #include <iostream>
 
@@ -35,7 +36,7 @@ int main() {
         // ===== 表示 =====
 
         Mat maskBGR;
-        cvtColor(mask, maskBGR, COLOR_GRAY2BGR); // 1チャンネル→3チャンネルに変換
+        cvtColor(mask, maskBGR, COLOR_GRAY2BGR); // チャネル変換 1ch -> 3ch
 
         Mat combinedImage;
         hconcat(vector<Mat>{rawFrame, maskBGR}, combinedImage);
