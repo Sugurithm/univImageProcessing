@@ -5,7 +5,7 @@ using namespace cv;
 using namespace std;
 
 #define FILE_NAME "image2.png"
-#define MIN_HSVCOLOR Scalar(5, 30, 60)
+#define MIN_HSVCOLOR Scalar(5, 50, 60)
 #define MAX_HSVCOLOR Scalar(20, 150, 255)
 
 Mat createMask(const Mat& frame) {

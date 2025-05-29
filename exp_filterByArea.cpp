@@ -6,7 +6,7 @@ using namespace cv;
 using namespace std;
 
 #define FILE_NAME "image2.png"
-#define MIN_HSVCOLOR Scalar(0, 30, 60)
+#define MIN_HSVCOLOR Scalar(0, 50, 60)
 #define MAX_HSVCOLOR Scalar(20, 150, 255)
 #define MIN_AREA_RATIO 0.03
 #define MAX_AREA_RATIO 0.3
