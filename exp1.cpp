@@ -4,11 +4,11 @@
 using namespace cv;
 using namespace std;
 
-#define MIN_HSVCOLOR Scalar(0, 50, 60)
-#define MAX_HSVCOLOR Scalar(20, 150, 255)
-#define MIN_AREA_RATIO 0.03
-#define MAX_AREA_RATIO 0.3
-#define EPSILON 0.01
+#define MIN_HSVCOLOR Scalar(0, 50, 60)      // 肌色の範囲
+#define MAX_HSVCOLOR Scalar(20, 150, 255)   // 肌色の範囲
+#define MIN_AREA_RATIO 0.03                 // 面積の最小値の割合
+#define MAX_AREA_RATIO 0.3                  // 面積の最大値の割合
+#define EPSILON 0.01                        // 輪郭の近似精度
 
 Mat createMask(const Mat& frame) {
     Mat hsvFrame, mask, blurredHsv;
@@ -22,10 +22,8 @@ Mat createMask(const Mat& frame) {
 
 Mat filterMaskByArea(const Mat& inputMask, int minArea, int maxArea) {
     vector<vector<Point>> contours;
-    // マスクのクローンを作成してから輪郭を見つける．元のマスクを変更しないため．
-    findContours(inputMask.clone(), contours, RETR_LIST, CHAIN_APPROX_NONE);
-
-    Mat filteredMask = Mat::zeros(inputMask.size(), CV_8UC1); // 輪郭を描画するためのマスク（初期設定は黒）
+    findContours(inputMask.clone(), contours, RETR_LIST, CHAIN_APPROX_NONE);    // マスクのクローンを作成してから輪郭を見つける．元のマスクを変更しないため．
+    Mat filteredMask = Mat::zeros(inputMask.size(), CV_8UC1);                   // 輪郭を描画するためのマスク（初期設定は黒）
 
     for (size_t i = 0; i < contours.size(); i++) {
         double area = contourArea(contours[i]);
@@ -42,6 +40,7 @@ Point calculateContourCenter(const vector<Point>& contour) {
     Moments m = moments(contour);
 
     if (m.m00 > 0) {
+        // 輪郭の重心を計算
         return Point(static_cast<int>(m.m10 / m.m00), static_cast<int>(m.m01 / m.m00));
     } else {
         return Point(-1, -1);
@@ -77,9 +76,8 @@ Mat visualizeEdgeCount(const Mat& mask) {
     return contourImage;
 }
 
-// 入力マスクから輪郭を抽出し、最大頂点数の輪郭を除外してフィルタリングされたマスクを生成する関数
 void sortEdgeInfo(vector<pair<int, vector<Point>>>& edgeInfo) {
-    // 降順にソート
+    // 輪郭の最大超点数を降順にソート
     for (size_t i = 0; i < edgeInfo.size(); i++) {
         for (size_t j = i + 1; j < edgeInfo.size(); j++) {
             if (edgeInfo[i].first < edgeInfo[j].first) {
@@ -149,7 +147,7 @@ int main() {
 
 
     while (true) {
-        camera >> rawFrame; // 1-A カメラから1フレーム読み込む
+        camera >> rawFrame;
         if (rawFrame.empty()) break;
         flip(rawFrame, rawFrame, 1); // 左右反転
 
