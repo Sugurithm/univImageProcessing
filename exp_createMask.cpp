@@ -4,7 +4,7 @@
 using namespace cv;
 using namespace std;
 
-#define FILE_NAME "image2.png"
+#define FILE_NAME "sample2.png"
 #define MIN_HSVCOLOR Scalar(5, 50, 60)
 #define MAX_HSVCOLOR Scalar(20, 150, 255)
 
@@ -40,7 +40,31 @@ Mat createMorphMask(const Mat& frame) {
 
 int main() {
     // 画像を読み込む
-    Mat rawFrame = imread(FILE_NAME);
+    // Mat rawFrame = imread(FILE_NAME);
+    // if (rawFrame.empty()) {
+    //     cerr << "error: image cannot be read" << endl;
+    //     return -1;
+    // }
+
+    // 画像を取得
+    VideoCapture camera(1);
+    Mat rawFrame;
+    while (true) {
+        camera >> rawFrame;
+        if (rawFrame.empty()) break;
+
+        flip(rawFrame, rawFrame, 1);
+        imshow("Original", rawFrame);
+
+        int key = waitKey(1);
+        if (key == 's') {
+            // 画像を保存
+            imwrite("sample2.png", rawFrame);
+            break;
+        }
+    }
+
+    rawFrame = imread("sample2.png");
     if (rawFrame.empty()) {
         cerr << "error: image cannot be read" << endl;
         return -1;
