@@ -20,7 +20,6 @@ Mat createMask(const Mat& frame) {
     return mask;
 }
 
-
 Mat filterMaskByArea(const Mat& inputMask, int minArea, int maxArea) {
     vector<vector<Point>> contours;
     // マスクのクローンを作成してから輪郭を見つける．元のマスクを変更しないため．
@@ -129,7 +128,6 @@ Mat filterMaskByEdges(const Mat& inputMask) {
     return resultMask;
 }
 
-
 int main() {
     VideoCapture camera(0);
     if (!camera.isOpened()) {
@@ -153,9 +151,9 @@ int main() {
     while (true) {
         camera >> rawFrame; // 1-A カメラから1フレーム読み込む
         if (rawFrame.empty()) break;
-
         flip(rawFrame, rawFrame, 1); // 左右反転
 
+        // ===== マスク処理 =====
         Mat mask = createMask(rawFrame); // マスク処理
         Mat filteredMask = filterMaskByArea(mask, calculateMinArea, calculateMaxArea); // 面積によるフィルタリング
         Mat filteredMask2 = visualizeEdgeCount(filteredMask); // 輪郭の近似
@@ -167,9 +165,11 @@ int main() {
         cvtColor(filteredMask, filteredMaskBGR, COLOR_GRAY2BGR); // 1ch -> 3ch
         cvtColor(filteredMask3, filteredMask3, COLOR_GRAY2BGR); // 1ch -> 3ch
 
+        // 間の仕切り
         int dividerWidth = 3;
         Mat divider = Mat(rawFrame.rows, dividerWidth, CV_8UC3, Scalar(0, 0, 255));
 
+        // 画像結合
         Mat combinedImage;
         hconcat(vector<Mat>{filteredMask2, divider, filteredMask3}, combinedImage);
         imshow("View Edge | Filtered Mask by Edges", combinedImage);
