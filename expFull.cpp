@@ -1,9 +1,3 @@
-/*
-画像情報処理実習 実験報告書１
-工学部 知能機械工学課程 3年
-37023616 大谷碩
-*/
-
 #include <opencv2/opencv.hpp>
 #include <iostream>
 
@@ -304,12 +298,15 @@ int main() {
         if (key == 'q') {
             break;
         } else if (key == 's') {    // 画像保存
+            cerr << "pushed 's' " << imageCount << endl;
             string filename = "image" + to_string(imageCount) + ".png";
             imwrite(filename, coloredHandFrame);
             imageCount++;           // 画像の数を増やす
         } else if (key == 'r') {    // 録画の切り替え
+            cerr << "pushed 'r' " << isRecording << endl;
             isRecording = !isRecording;
         } else if (key == 'p') {    // 録画中の動画再生
+            cerr << "pushed 'p' " << video.isOpened() << endl;
             if (!video.isOpened()) playVideo(videoFilename);
         }
     }
