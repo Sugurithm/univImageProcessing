@@ -12,12 +12,12 @@ using namespace std;
 #define MAX_AREA_RATIO 0.3
 
 Mat createMask(const Mat& frame) {
-    Mat hsvFrame, mask, blurred;
+    Mat hsvFrame, mask, blurredHsv;
     cvtColor(frame, hsvFrame, COLOR_BGR2HSV); // BGR→HSV変換
-    GaussianBlur(hsvFrame, blurred, Size(5, 5), 1); // 平滑化
+    GaussianBlur(hsvFrame, blurredHsv, Size(5, 5), 1); // 平滑化
     inRange(hsvFrame, MIN_HSVCOLOR, MAX_HSVCOLOR, mask); // 2-A 色抽出
-    // morphologyEx(mask, mask, MORPH_OPEN, Mat(), Point(-1, -1), 3); // オープニング
-    // morphologyEx(mask, mask, MORPH_CLOSE, Mat(), Point(-1, -1), 3); // クローシング
+    morphologyEx(mask, mask, MORPH_OPEN, Mat(), Point(-1, -1), 5); // オープニング
+    morphologyEx(mask, mask, MORPH_CLOSE, Mat(), Point(-1, -1), 5); // クローシング
     return mask;
 }
 
@@ -36,7 +36,45 @@ Mat filterMaskByArea(const Mat& inputMask, int minArea, int maxArea) {
             drawContours(filteredMask, contours, i, Scalar(255), FILLED);
         }
     }
+
     return filteredMask;
+}
+
+Point calculateContourCenter(const vector<Point>& contour) {
+    Moments m = moments(contour);
+
+    if (m.m00 > 0) {
+        return Point(static_cast<int>(m.m10 / m.m00), static_cast<int>(m.m01 / m.m00));
+    } else {
+        return Point(-1, -1);
+    }
+}
+
+// 入力マスクから輪郭を抽出し、最大頂点数の輪郭を除外してフィルタリングされたマスクを生成する関数
+Mat visualizeEdgeCount(const Mat& mask) {
+
+    // 1. 輪郭検出
+    vector<vector<Point>> contours;
+    findContours(mask.clone(), contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+
+    // 2. 近似
+    vector<vector<Point>> approxContours(contours.size());
+    for (size_t i = 0; i < contours.size(); i++) {
+        approxPolyDP(contours[i], approxContours[i], 3, true);
+    }
+
+    // 3. 描画
+    Mat contourImage = Mat::zeros(mask.size(), CV_8UC3);
+    for (size_t i = 0; i < approxContours.size(); i++) {
+        drawContours(contourImage, approxContours, (int)i, Scalar(0, 255, 0), 2); // 緑色で描画
+        // 辺の数を
+        int edgeCount = approxContours[i].size();
+        Point center = calculateContourCenter(approxContours[i]);
+        circle(contourImage, center, 5, Scalar(0, 255, 255), 2);
+        putText(contourImage, to_string(edgeCount), center, FONT_HERSHEY_SIMPLEX, 2, Scalar(0, 0, 255), 2);
+    }
+
+    return contourImage;
 }
 
 int main() {
@@ -52,6 +90,7 @@ int main() {
 
     Mat mask = createMask(rawFrame); // マスク処理
     Mat filteredMask = filterMaskByArea(mask, totalPixels * MIN_AREA_RATIO, totalPixels * MAX_AREA_RATIO); // 面積によるフィルタリング
+    Mat filteredMask2 = visualizeEdgeCount(filteredMask); // 輪郭の近似
 
     // ===== 表示 =====
     Mat maskBGR, filteredMaskBGR;
@@ -62,9 +101,10 @@ int main() {
     Mat divider = Mat(rawFrame.rows, dividerWidth, CV_8UC3, Scalar(0, 0, 255));
 
     Mat combinedImage;
-    hconcat(vector<Mat>{rawFrame, divider, maskBGR, divider, filteredMaskBGR}, combinedImage);
-    imshow("Original | Color Mask | Filtered Mask by Area", combinedImage);
+    hconcat(vector<Mat>{filteredMaskBGR, divider, filteredMask2}, combinedImage);
+    imshow("Filtered Mask by Area | Filtered Mask by Edges", combinedImage);
 
+    // imshow("Filtered Mask by Edges", filteredMask2);
 
     waitKey(0); // 何かキーが押されるまで表示を維持
 
