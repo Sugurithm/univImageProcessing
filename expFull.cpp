@@ -172,7 +172,7 @@ Mat changeHandColor(const Mat& currentFrame, const Mat& prevFrame, const Mat& ha
     Mat resultFrame = currentFrame.clone(); // 手の領域だけを取り出す
 
     // 動いていれば赤色，動いていなければ元の色
-    if (movingArea > totalPixels * 0.001) {
+    if (movingArea > totalPixels * 0.0001) {
         resultFrame.setTo(Scalar(0, 0, 255), handMask);
     }
 

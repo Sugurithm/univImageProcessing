@@ -127,7 +127,7 @@ Mat filterMaskByEdges(const Mat& inputMask) {
 }
 
 int main() {
-    VideoCapture camera(0);
+    VideoCapture camera(1);
     if (!camera.isOpened()) {
         cerr << "Camera Open Failed" << endl;
         return -1;
@@ -169,8 +169,9 @@ int main() {
 
         // 画像結合
         Mat combinedImage;
-        hconcat(vector<Mat>{filteredMask2, divider, filteredMask3}, combinedImage);
-        imshow("View Edge | Filtered Mask by Edges", combinedImage);
+        // original, filtered by area, filtered by edges
+        hconcat(vector<Mat>{rawFrame, divider, filteredMaskBGR, divider, filteredMask2}, combinedImage);
+        imshow("Original | Filtered Mask by Area | Filtered Mask by Edges", combinedImage);
 
         // ===== キー入力 ====
         int key = waitKey(1);
