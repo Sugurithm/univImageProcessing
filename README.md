@@ -4,11 +4,11 @@
 
 • OS：macOS Sequoia  
 • Chip：Apple M2  
-• Camera：mac book air M2 2022 標準搭載のもの  
 • Memory：16GB  
-• 開発⾔語：C++　　
-• 主要ライブラリ：OpenCV4　　
-• 開発ツール：Visual Studio Code ( Visual Studio Code 2022 ではない ).  
+• Camera：mac book air M2 2022 標準搭載のもの  
+• 開発⾔語：C++  
+• 主要ライブラリ：OpenCV4  
+• 開発ツール：Visual Studio Code ( Visual Studio Code 2022 ではない )  
 • ビルド方法： g++ exp2ac.cpp -o main `pkg-config --cflags --libs opencv4`  
 
 ## exp1：カメラからの入力映像から手を認識させるシステム　　 
