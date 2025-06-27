@@ -45,8 +45,8 @@ Mat computeGradient(const Mat& frame) {
 
     // オペレータを適用
     Mat grad_x, grad_y;
-    filter2D(grayImage, grad_x, CV_16S, sobel_x);
-    filter2D(grayImage, grad_y, CV_16S, sobel_y);
+    filter2D(grayImage, grad_x, -1, sobel_x);
+    filter2D(grayImage, grad_y, -1, sobel_y);
 
     // 画素値の絶対値をとる．
     Mat abs_grad_x, abs_grad_y, grad_combined;
@@ -342,5 +342,4 @@ int main() {
     destroyAllWindows();
     g_output_file.close();
     return 0;
-
 }

@@ -8,7 +8,7 @@ using namespace cv;
 using namespace std;
 
 // ==================== グローバル変数 ====================
-// マウスコールバック関数とメインループ間で共有される状態
+// マウスコールバック関数とメインループ間で共有される
 Mat template_image_rgb;    // 逐次更新されるRGBテンプレート画像
 Mat template_image_edge;   // 逐次更新されるテンプレート画像のエッジ画像
 Mat template_image_dist;   // 逐次更新されるテンプレート画像の距離変換結果
@@ -34,7 +34,7 @@ void on_mouse(int event, int x, int y, int flags, void* userdata) {
             cout << "ROI-Start-Point: (" << x << ", " << y << ")" << endl;
         } else { // ROI選択終了（2回目のクリック）
             Point end_point(x, y);
-            // 矩形の座標を正規化 (左上と右下を確実に設定)
+            // 矩形の座標を正規化
             g_roi_rect = Rect(
                 min(g_start_point.x, end_point.x),
                 min(g_start_point.y, end_point.y),
@@ -53,9 +53,6 @@ void on_mouse(int event, int x, int y, int flags, void* userdata) {
 
 
 // Chamfer Matchingを実行する関数
-// image_dist: 入力フレームの距離変換画像
-// templ_edge: テンプレートのエッジ画像
-// 戻り値: マッチングスコアのMat (低いほど一致度が高い)
 Mat chamferMatch(const Mat& image_dist, const Mat& templ_edge) {
     int result_cols = image_dist.cols - templ_edge.cols + 1;
     int result_rows = image_dist.rows - templ_edge.rows + 1;
@@ -196,7 +193,6 @@ bool process_tracking_frame(Mat& frame, const string& window_name) {
     Mat frame_dist;
     distanceTransform(frame_edge, frame_dist, DIST_L2, DIST_MASK_5); // テンプレートと同じマスクサイズを使用
 
-    // =========================================================
     Point matchLoc;
 
     // === 高速化オプション1: 探索範囲の限定 ===
@@ -289,17 +285,17 @@ bool process_tracking_frame(Mat& frame, const string& window_name) {
 
 // ==================== main 関数 ====================
 int main() {
+    // =============== 1.　動画の読み込み =================
     string video_path = "traffic.mov";
     string window_name = "Camera Feed";
 
-    // 1. 動画キャプチャの設定
     VideoCapture cap;
     if (!setup_capture_and_window(cap, video_path, window_name)) {
         cerr << "動画ファイルを開けませんでした: " << video_path << endl;
         return -1;
     }
 
-    // 2. ROIのインタラクティブ選択
+    // =============== 2.　ROI選択 =================
     cout << "動画からROIを選択してください。オブジェクトを囲むように2回クリックしてください。" << endl;
     if (!select_roi(cap, window_name)) {
         cout << "ROI選択がキャンセルされました。" << endl;
@@ -308,14 +304,14 @@ int main() {
         return 0;
     }
 
-    // 3. テンプレート画像の初期化
+    // =============== 3.　テンプレートの初期化 =================
     if (!initialize_template()) {
         cap.release();
         destroyAllWindows();
         return -1;
     }
 
-    // 4. フレームごとの追跡処理
+    // ============== 4. トラッキング =================
     Mat frame;
     cout << "追跡を開始します。'q' または 'Esc' キーで終了します。" << endl;
     while (true) {
